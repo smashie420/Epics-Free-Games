@@ -1,0 +1,18 @@
+{
+  "name": "epic-games-today-free-day",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "discord-webhook-node": "^1.1.8",
+    "fs": "^0.0.1-security",
+    "puppeteer": "^5.5.0",
+    "readline": "^1.3.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "smashie420",
+  "license": "ISC"
+}
