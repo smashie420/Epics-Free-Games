@@ -58,7 +58,7 @@ function sendWebHook(hookUrl, gameURL, gameTitle, gameStatus, gameIMG){
         }
     })
 }
-
+let pastGames = new Set()
 async function RunTask(){
     console.log("Running Task")
     let discordURL = fs.readFileSync('data', 'utf-8')
@@ -77,6 +77,9 @@ async function RunTask(){
             freeGameURL: document.querySelector('div.css-53yrcz-CardGridDesktopLandscape__cardWrapperDesktop div[data-component="WithClickTrackingComponent"] a').href
         }
     })
+    pastGames.add(data.freeGameName)
+    if(pastGames.has(data.freeGameName)){return} // checks if same game was already sent :p 
+    
     sendWebHook(discordURL, data.freeGameURL, data.freeGameName, data.freeStatus, data.freeGameIMG)
     //await page.screenshot({path: 'example.png'});
     await browser.close();
