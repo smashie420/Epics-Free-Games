@@ -2,8 +2,10 @@
   "name": "epic-games-today-free-day",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "epic-games.js",
   "dependencies": {
+    "child_process": "^1.0.2",
+    "colors": "^1.4.0",
     "discord-webhook-node": "^1.1.8",
     "fs": "^0.0.1-security",
     "puppeteer": "^5.5.0",

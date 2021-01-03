@@ -1,12 +1,30 @@
 const puppeteer = require('puppeteer') // Webscraping 
 const fs = require('fs') // For reading files
 const { Webhook, MessageBuilder } = require('discord-webhook-node') // For discord
-const readline = require("readline");
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
+const spawn = require('child_process')
+const colors = require('colors')
+function log(msg){
+    console.log(`${colors.cyan('[EPIC FREE GAMES]')} ${msg}`)
+}
 
+function runScript(scriptPath, callback) {
+    // keep track of whether callback has been invoked to prevent multiple invocations
+    var invoked = false
+    var process = spawn.fork(scriptPath)
+        // listen for errors as they may prevent the exit event from firing
+    process.on('error', function(err) {
+        if (invoked) return
+        invoked = true
+        callback(err)
+    });
+    // execute the callback once the process has finished running
+    process.on('exit', function(code) {
+        if (invoked) return
+        invoked = true
+        var err = code === 0 ? null : new Error('exit code ' + code)
+        callback(err)
+    });
+}
 
 async function autoScroll(page){ // https://stackoverflow.com/questions/51529332/puppeteer-scroll-down-until-you-cant-anymore/53527984
     await page.evaluate(async () => {
@@ -51,7 +69,7 @@ function sendWebHook(hookUrl, gameURL, gameTitle, gameStatus, gameIMG){
 }
 let pastGames = new Set()
 async function RunTask(){
-    console.log("Running Task")
+    log("Running Task")
 
     let discordURL = fs.readFileSync('data', 'utf-8')
 
@@ -74,21 +92,14 @@ async function RunTask(){
     sendWebHook(discordURL, data.freeGameURL, data.freeGameName, data.freeStatus, data.freeGameIMG)
     //await page.screenshot({path: 'example.png'});
     await browser.close();
-    console.log("Task Finished")
-    console.log("Running Cooldown (1 day)")
+    log("Task Finished")
+    log("Running Cooldown (1 day)")
 }
 
 if(!fs.existsSync("data")){
-    rl.question("Enter your discord webhook: ", function(discordWebHook) {
-        fs.writeFileSync('data', discordWebHook, (err) => {if(err) throw err})
-        rl.close();
-    });
-    rl.on("close", function() {
-        RunTask()
-        setInterval( function () {
-            RunTask()
-        }, 86400000)
-    });
+    runScript("./dataMaker.js", function(err) {
+        if (err) throw err;
+    })
 }else{
     RunTask()
     setInterval( function () {
