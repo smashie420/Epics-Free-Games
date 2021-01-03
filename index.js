@@ -55,7 +55,7 @@ async function RunTask(){
 
     let discordURL = fs.readFileSync('data', 'utf-8')
 
-    const browser = await puppeteer.launch({headless:false});
+    const browser = await puppeteer.launch();
     const page = await browser.newPage();
     await page.goto('https://www.epicgames.com/store/en-US/');
     await page.waitForSelector("div.css-1x7so3u-CardGroupHighlightDesktop__root span.css-2ucwu")
