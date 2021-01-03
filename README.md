@@ -4,7 +4,7 @@
   </p>
 
   <p style="text-align: center;">
-    <h2>A simple site watcher that send SMS notifications</h2>
+    <h2>A simple bot that checks daily for free games</h2>
   </p>
   
   <p>
