@@ -29,12 +29,12 @@ node index.js
 ```bash
 curl -sL https://deb.nodesource.com/setup_15.x | sudo -E bash -       && \
 sudo apt-get install nodejs git make curl -y                          && \
-sudo npm install -g pm2 yarn                                          && \
+sudo npm install -g pm2                                               && \
 cd ~                                                                  && \
 git clone https://github.com/smashie420/Epic-Games-Today-Free-Day     && \
 cd Epic-Games-Today-Free-Day                                          && \
-yarn install --production                                             && \
 npm install                                                           && \
+node epic-games.js                                                    && \
 echo "[EPIC FREE GAMES] Finished! Please run pm2 start index.js"
 ```
 > If you wish to change settings please run `rm data`
