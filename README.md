@@ -9,7 +9,7 @@
   
   <p>
     <!--<img src="https://i.imgur.com/VOHG0Bx.gif" title="Example">-->
-    <img src="https://i.imgur.com/JeTxvxn.png" title="Example">
+    <img src="https://i.imgur.com/sn0jbCJ.png" title="Example">
   </p>
 </div>
 
