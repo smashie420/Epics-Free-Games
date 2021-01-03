@@ -35,7 +35,7 @@ git clone https://github.com/smashie420/Epic-Games-Today-Free-Day     && \
 cd Epic-Games-Today-Free-Day                                          && \
 npm install                                                           && \
 node epic-games.js                                                    && \
-echo "[EPIC FREE GAMES] Finished! Please run pm2 start index.js"
+echo "[EPIC FREE GAMES] Finished! Please run pm2 start epic-games.js"
 ```
 > If you wish to change settings please run `rm data`
 
