@@ -55,12 +55,13 @@ async function RunTask(){
 
     let discordURL = fs.readFileSync('data', 'utf-8')
 
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({headless:false});
     const page = await browser.newPage();
     await page.goto('https://www.epicgames.com/store/en-US/');
     await page.waitForSelector("div.css-1x7so3u-CardGroupHighlightDesktop__root span.css-2ucwu")
 
     await autoScroll(page) // Need to do this because cloudflare and image doesnt load unless scrolled
+    console.log("Running Task 1")
     const data = await page.evaluate(() =>{
         return {
             freeGameName: document.querySelector("div.css-1x7so3u-CardGroupHighlightDesktop__root span.css-2ucwu").innerHTML,
@@ -69,8 +70,8 @@ async function RunTask(){
             freeGameURL: document.querySelector('div.css-53yrcz-CardGridDesktopLandscape__cardWrapperDesktop div[data-component="WithClickTrackingComponent"] a').href
         }
     })
-    pastGames.add(data.freeGameName)
     if(pastGames.has(data.freeGameName)){return} // checks if same game was already sent :p 
+    pastGames.add(data.freeGameName)
     sendWebHook(discordURL, data.freeGameURL, data.freeGameName, data.freeStatus, data.freeGameIMG)
     //await page.screenshot({path: 'example.png'});
     await browser.close();
@@ -84,7 +85,6 @@ if(!fs.existsSync("data")){
         rl.close();
     });
     rl.on("close", function() {
-        console.log("\nRunning");
         RunTask()
         setInterval( function () {
             RunTask()
