@@ -8,15 +8,6 @@ const rl = readline.createInterface({
 });
 
 
-if(!fs.existsSync("data")){
-    rl.question("Enter your discord webhook: ", function(discordWebHook) {
-        fs.writeFile('data', discordWebHook, (err) => {if(err) throw err})
-        rl.close();
-    });
-    rl.on("close", function() {
-        console.log("\nRunning");
-    });
-}
 async function autoScroll(page){ // https://stackoverflow.com/questions/51529332/puppeteer-scroll-down-until-you-cant-anymore/53527984
     await page.evaluate(async () => {
         await new Promise((resolve, reject) => {
@@ -61,9 +52,10 @@ function sendWebHook(hookUrl, gameURL, gameTitle, gameStatus, gameIMG){
 let pastGames = new Set()
 async function RunTask(){
     console.log("Running Task")
+
     let discordURL = fs.readFileSync('data', 'utf-8')
 
-    const browser = await puppeteer.launch({headless:false});
+    const browser = await puppeteer.launch();
     const page = await browser.newPage();
     await page.goto('https://www.epicgames.com/store/en-US/');
     await page.waitForSelector("div.css-1x7so3u-CardGroupHighlightDesktop__root span.css-2ucwu")
@@ -79,7 +71,6 @@ async function RunTask(){
     })
     pastGames.add(data.freeGameName)
     if(pastGames.has(data.freeGameName)){return} // checks if same game was already sent :p 
-    
     sendWebHook(discordURL, data.freeGameURL, data.freeGameName, data.freeStatus, data.freeGameIMG)
     //await page.screenshot({path: 'example.png'});
     await browser.close();
@@ -87,8 +78,21 @@ async function RunTask(){
     console.log("Running Cooldown (1 day)")
 }
 
-RunTask()
-setInterval( function () {
+if(!fs.existsSync("data")){
+    rl.question("Enter your discord webhook: ", function(discordWebHook) {
+        fs.writeFileSync('data', discordWebHook, (err) => {if(err) throw err})
+        rl.close();
+    });
+    rl.on("close", function() {
+        console.log("\nRunning");
+        RunTask()
+        setInterval( function () {
+            RunTask()
+        }, 86400000)
+    });
+}else{
     RunTask()
- }, 86400000)
-
+    setInterval( function () {
+        RunTask()
+    }, 86400000)
+}
