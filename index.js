@@ -61,7 +61,6 @@ async function RunTask(){
     await page.waitForSelector("div.css-1x7so3u-CardGroupHighlightDesktop__root span.css-2ucwu")
 
     await autoScroll(page) // Need to do this because cloudflare and image doesnt load unless scrolled
-    console.log("Running Task 1")
     const data = await page.evaluate(() =>{
         return {
             freeGameName: document.querySelector("div.css-1x7so3u-CardGroupHighlightDesktop__root span.css-2ucwu").innerHTML,
