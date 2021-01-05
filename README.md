@@ -17,8 +17,7 @@
   </p>
 </div>
 
-
-[Github All Releases](https://img.shields.io/github/stars/smashie420/Epic-Games-Today-Free-Day?style=social)
+[![Github All Releases](https://img.shields.io/github/stars/smashie420/Epic-Games-Today-Free-Day?style=social)]()
 # Windows Installation
 - [Node JS Installed](https://nodejs.org/en/download/)
 - [Git Installed](https://git-scm.com/downloads)
