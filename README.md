@@ -1,6 +1,7 @@
 <div align="center">
   <p>
     <img src="https://i.imgur.com/hiUD8fe.png" title="Logo">
+    [![Github All Releases](https://img.shields.io/github/stars/smashie420/Epic-Games-Today-Free-Day?style=social)]()
   </p>
 
   <p style="text-align: center;">
