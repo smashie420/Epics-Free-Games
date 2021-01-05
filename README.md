@@ -5,8 +5,9 @@
 
   <p>
     <img src="https://img.shields.io/github/stars/smashie420/Epic-Games-Today-Free-Day?style=for-the-badge">
-    <img src="https://img.shields.io/bitbucket/issues-raw/smashie420/Epic-Games-Today-Free-Day?style=for-the-badge">
     <img src="https://img.shields.io/github/stars/smashie420/Epic-Games-Today-Free-Day?style=for-the-badge">
+    <img src="https://img.shields.io/bitbucket/issues-raw/smashie420/Epic-Games-Today-Free-Day?style=for-the-badge">
+    
   </p>
   <p style="text-align: center;">
     <h2>A simple bot that checks daily for free games</h2>
