@@ -1,6 +1,7 @@
 <div align="center">
   <p>
     <img src="https://i.imgur.com/hiUD8fe.png" title="Logo">
+    <img src="https://img.shields.io/github/stars/smashie420/Epic-Games-Today-Free-Day?style=social">
   </p>
 
   <p style="text-align: center;">
@@ -12,8 +13,6 @@
     <img src="https://i.imgur.com/sn0jbCJ.png" title="Example">
   </p>
 </div>
-
-[![Github Stars](https://img.shields.io/github/stars/smashie420/Epic-Games-Today-Free-Day?style=social)]()
 
 # Windows Installation
 - [Node JS Installed](https://nodejs.org/en/download/)
