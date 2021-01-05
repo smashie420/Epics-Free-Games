@@ -4,7 +4,7 @@
   </p>
 
   <p>
-    <img src="https://img.shields.io/github/stars/smashie420/Epic-Games-Today-Free-Day?style=social">
+    <img src="https://img.shields.io/github/stars/smashie420/Epic-Games-Today-Free-Day?style=social?style=for-the-badge&logo=appveyor">
   </p>
   <p style="text-align: center;">
     <h2>A simple bot that checks daily for free games</h2>
