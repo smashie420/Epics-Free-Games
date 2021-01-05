@@ -8,16 +8,13 @@
   </p>
   
   <p>
-    <h2>Please ⭐ my projects!</h2>
-  </p>
-  
-  <p>
     <!--<img src="https://i.imgur.com/VOHG0Bx.gif" title="Example">-->
     <img src="https://i.imgur.com/sn0jbCJ.png" title="Example">
   </p>
 </div>
 
-[![Github All Releases](https://img.shields.io/github/stars/smashie420/Epic-Games-Today-Free-Day?style=social)]()
+[![Github Stars](https://img.shields.io/github/stars/smashie420/Epic-Games-Today-Free-Day?style=social)]()
+
 # Windows Installation
 - [Node JS Installed](https://nodejs.org/en/download/)
 - [Git Installed](https://git-scm.com/downloads)
