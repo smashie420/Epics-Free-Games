@@ -4,7 +4,8 @@ const { Webhook, MessageBuilder } = require('discord-webhook-node') // For disco
 const spawn = require('child_process')
 const colors = require('colors')
 function log(msg){
-    console.log(`${colors.cyan('[EPIC FREE GAMES]')} ${msg}`)
+    let date = new Date().toString().replace(/T/, ':').replace(/\.\w*/, '').replace(":hu ", "").replace(" GMT-0800 (Pacific Standard Time)", "");
+    console.log(`${colors.cyan('[EPIC FREE GAMES]')} ${colors.magenta(date)} ${msg}`)
 }
 
 function runScript(scriptPath, callback) {
@@ -25,6 +26,22 @@ function runScript(scriptPath, callback) {
         callback(err)
     });
 }
+async function writeLog(text){
+    let date_ob =  new Date();
+    // YYYY-MM-DD HH:MM:SS format
+    let formattedTime = date_ob.getFullYear() + "-" + (date_ob.getMonth() + 1) + "-" + ('0'+date_ob.getDate()).slice(-2) + " " + ('0' + date_ob.getHours()).slice(-2) + ":" + ('0' + date_ob.getMinutes()).slice(-2) + ":" +  ('0'+date_ob.getSeconds()).slice(-2)  +  "       "
+
+    if(fs.existsSync("game-logs.txt")){
+        fs.appendFile('game-logs.txt', "\n"+formattedTime + text, function (err) {
+            if (err) throw (err)
+        })
+    }else{
+        fs.writeFile('game-logs.txt', formattedTime + text, function (err) {
+            if (err) throw (err)
+        })
+    }
+}
+
 
 async function autoScroll(page){ // https://stackoverflow.com/questions/51529332/puppeteer-scroll-down-until-you-cant-anymore/53527984
     await page.evaluate(async () => {
@@ -87,13 +104,17 @@ async function RunTask(){
             freeGameURL: document.querySelector('div.css-53yrcz-CardGridDesktopLandscape__cardWrapperDesktop div[data-component="WithClickTrackingComponent"] a').href
         }
     })
-    if(pastGames.has(data.freeGameName)){return} // checks if same game was already sent :p 
+    if(pastGames.has(data.freeGameName)){// checks if same game was already sent :p 
+        log("Game has already been sent!")
+        return
+    } 
     pastGames.add(data.freeGameName)
     sendWebHook(discordURL, data.freeGameURL, data.freeGameName, data.freeStatus, data.freeGameIMG)
+    writeLog(`${data.freeGameName} has been sent!`)
     //await page.screenshot({path: 'example.png'});
     await browser.close();
     log("Task Finished")
-    log("Running Cooldown (1 day)")
+    log("Running Cooldown (12 hours)")
 }
 
 if(!fs.existsSync("data")){
@@ -104,5 +125,5 @@ if(!fs.existsSync("data")){
     RunTask()
     setInterval( function () {
         RunTask()
-    }, 86400000)
+    }, 43200000)
 }
