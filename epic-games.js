@@ -106,6 +106,7 @@ async function RunTask(){
     })
     if(pastGames.has(data.freeGameName)){// checks if same game was already sent :p 
         log("Game has already been sent!")
+        await browser.close();
         return
     } 
     pastGames.add(data.freeGameName)
