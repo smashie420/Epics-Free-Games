@@ -4,8 +4,10 @@ const { Webhook, MessageBuilder } = require('discord-webhook-node') // For disco
 const spawn = require('child_process')
 const colors = require('colors')
 function log(msg){
-    let date = new Date().toString().replace(/T/, ':').replace(/\.\w*/, '').replace(":hu ", "").replace(" GMT-0800 (Pacific Standard Time)", "");
-    console.log(`${colors.cyan('[EPIC FREE GAMES]')} ${colors.magenta(date)} ${msg}`)
+    let date_ob =  new Date();
+    // YYYY-MM-DD HH:MM:SS format
+    let formattedTime = date_ob.getFullYear() + "-" + (date_ob.getMonth() + 1) + "-" + ('0'+date_ob.getDate()).slice(-2) + " " + ('0' + date_ob.getHours()).slice(-2) + ":" + ('0' + date_ob.getMinutes()).slice(-2) + ":" +  ('0'+date_ob.getSeconds()).slice(-2)  +  "       "
+    console.log(`${colors.cyan('[EPIC FREE GAMES]')} ${colors.magenta(formattedTime)} ${msg}`)
 }
 
 function runScript(scriptPath, callback) {
@@ -75,7 +77,7 @@ function sendWebHook(hookUrl, gameURL, gameTitle, gameStatus, gameIMG){
     .addField('Name', `\`${gameTitle}\``, true)
     .addField('Status', `\`${gameStatus}\``, true)
     
-    .setFooter('Made by smashguns#6175', 'https://cdn.discordapp.com/avatars/242889488785866752/a_b10cbd07f0e594f669179b7b58ce721e.gif?size=256&f=.gif')
+    .setFooter('Made by smashguns#6175', 'https://cdn.discordapp.com/avatars/242889488785866752/a_4f1fac503d4d074585a697083c62e410.gif?size=128')
     .setTimestamp();
 
     hook.send(embed).catch(error =>{
