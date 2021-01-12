@@ -90,7 +90,7 @@ let pastGames = new Set()
 async function RunTask(){
     log("Running Task")
 
-    let discordURL = fs.readFileSync('data', 'utf-8')
+    //let discordURL = fs.readFileSync('data', 'utf-8')
 
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
@@ -112,7 +112,10 @@ async function RunTask(){
         return
     } 
     pastGames.add(data.freeGameName)
-    sendWebHook(discordURL, data.freeGameURL, data.freeGameName, data.freeStatus, data.freeGameIMG)
+    let webhooks = JSON.parse( fs.readFileSync("data", 'utf-8') )
+    webhooks.forEach(hook => {
+        sendWebHook(hook, data.freeGameURL, data.freeGameName, data.freeStatus, data.freeGameIMG)
+    });
     writeLog(`${data.freeGameName} has been sent!`)
     //await page.screenshot({path: 'example.png'});
     await browser.close();
