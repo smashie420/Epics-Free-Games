@@ -34,7 +34,7 @@ node index.js
 
 # Linux Installation
 ```bash
-curl -sL https://deb.nodesource.com/setup_15.x | sudo -E bash -       && \
+curl -sL https://deb.nodesource.com/setup_14.x | sudo bash -          && \
 sudo apt-get install nodejs git curl chromium-browser -y              && \
 sudo npm install -g pm2                                               && \
 cd ~                                                                  && \
