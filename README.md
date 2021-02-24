@@ -34,8 +34,11 @@ node index.js
 
 # Linux Installation
 ```bash
-curl -sL https://deb.nodesource.com/setup_15.x | sudo -E bash -       && \
-sudo apt-get install nodejs git curl chromium-browser -y              && \
+sudo apt update                                                       && \
+sudo apt-get install curl -y                                          && \
+curl -sL https://deb.nodesource.com/setup_14.x | sudo bash -          && \
+sudo apt-get install nodejs git curl -y                               && \
+sudo apt-get install chromium-browser=80.0.3987.163-0ubuntu1          && \
 sudo npm install -g pm2                                               && \
 cd ~                                                                  && \
 git clone https://github.com/smashie420/Epic-Games-Today-Free-Day     && \
