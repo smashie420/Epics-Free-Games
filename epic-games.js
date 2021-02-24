@@ -151,7 +151,6 @@ async function RunTask(){
             let webhooks = JSON.parse( fs.readFileSync("data", 'utf-8') )
             webhooks.forEach(hook => {
                 sendWebHook(hook, data.freeGameURL[arrNum], name, data.freeStatus[arrNum], data.freeDate[arrNum], data.freeGameIMG[arrNum])
-                console.log(hook)
             });
             writeLog(`${name} has been sent!`)
         });
