@@ -63,7 +63,7 @@ async function autoScroll(page){ // https://stackoverflow.com/questions/51529332
         });
     });
 }
-function sendWebHook(hookUrl, gameURL, gameTitle, gameStatus, gameIMG){
+function sendWebHook(hookUrl, gameURL, gameTitle, gameStatus, gameDate, gameIMG){
     const hook = new Webhook(hookUrl);
     hook.setUsername('Epic Games');
     hook.setAvatar('https://d3bzyjrsc4233l.cloudfront.net/company_office/epicgames_logo.png');
@@ -76,7 +76,8 @@ function sendWebHook(hookUrl, gameURL, gameTitle, gameStatus, gameIMG){
     .setImage(gameIMG)
     .addField('Name', `\`${gameTitle}\``, true)
     .addField('Status', `\`${gameStatus}\``, true)
-    
+    .addField('Date', `\`${gameDate}\``, true)
+
     .setFooter('Made by smashguns#6175', 'https://cdn.discordapp.com/avatars/242889488785866752/a_4f1fac503d4d074585a697083c62e410.gif?size=128')
     .setTimestamp();
 
@@ -91,36 +92,76 @@ async function RunTask(){
     log("Running Task")
 
     //let discordURL = fs.readFileSync('data', 'utf-8')
+    try{
+        const browser = await puppeteer.launch({headless:false});
+        const page = await browser.newPage();
+        await page.goto('https://www.epicgames.com/store/en-US/');
+        await page.waitForSelector("div.css-1x7so3u-CardGroupHighlightDesktop__root span.css-2ucwu")
 
-    const browser = await puppeteer.launch();
-    const page = await browser.newPage();
-    await page.goto('https://www.epicgames.com/store/en-US/');
-    await page.waitForSelector("div.css-1x7so3u-CardGroupHighlightDesktop__root span.css-2ucwu")
+        await autoScroll(page) // Need to do this because cloudflare and image doesnt load unless scrolled
+        const data = await page.evaluate(() =>{
+            let resGameNameArr = []
+            document.querySelectorAll("div.css-1x7so3u-CardGroupHighlightDesktop__root span.css-2ucwu").forEach((res)=>{
+                resGameNameArr.push(res.innerHTML)
+            })
 
-    await autoScroll(page) // Need to do this because cloudflare and image doesnt load unless scrolled
-    const data = await page.evaluate(() =>{
-        return {
-            freeGameName: document.querySelector("div.css-1x7so3u-CardGroupHighlightDesktop__root span.css-2ucwu").innerHTML,
-            freeGameIMG: document.querySelector("div.css-1x7so3u-CardGroupHighlightDesktop__root img").src,
-            freeStatus: document.querySelector("div.css-1x7so3u-CardGroupHighlightDesktop__root span.css-os6fbq").innerText,
-            freeGameURL: document.querySelector('div.css-53yrcz-CardGridDesktopLandscape__cardWrapperDesktop div[data-component="WithClickTrackingComponent"] a').href
-        }
-    })
-    if(pastGames.has(data.freeGameName)){// checks if same game was already sent :p 
-        log("Game has already been sent!")
+            let resGameImgArr = []
+            document.querySelectorAll("div.css-1x7so3u-CardGroupHighlightDesktop__root img").forEach((res) =>{
+                resGameImgArr.push(res.src)
+            })
+
+            let resDateArr = []
+            document.querySelectorAll("div.css-1x7so3u-CardGroupHighlightDesktop__root span.css-os6fbq").forEach((res)=>{
+                resDateArr.push(res.innerText)
+            })
+
+            let resStatusArr = []
+            document.querySelectorAll("div.css-1x7so3u-CardGroupHighlightDesktop__root div.css-1r3zsoc-StatusBar__root, div.css-1x7so3u-CardGroupHighlightDesktop__root div.css-1pfureu-StatusBar__root").forEach((res)=>{
+                resStatusArr.push(res.innerText)
+            })
+
+            let resGameURLArr = []
+            document.querySelectorAll("div.css-1x7so3u-CardGroupHighlightDesktop__root div.css-53yrcz-CardGridDesktopLandscape__cardWrapperDesktop div[data-component='WithClickTrackingComponent'] a").forEach((res)=>{
+                resGameURLArr.push(res.href)
+            })
+            
+            return{
+                freeGameName: resGameNameArr,
+                freeGameIMG: resGameImgArr,
+                freeStatus: resStatusArr,
+                freeDate: resDateArr,
+                freeGameURL: resGameURLArr
+            }
+            /*
+            return {
+                freeGameName: document.querySelectorAll("div.css-1x7so3u-CardGroupHighlightDesktop__root span.css-2ucwu").innerHTML,
+                freeGameIMG: document.querySelectorAll("div.css-1x7so3u-CardGroupHighlightDesktop__root img").src,
+                freeStatus: document.querySelectorAll("div.css-1x7so3u-CardGroupHighlightDesktop__root span.css-os6fbq").innerText,
+                freeGameURL: document.querySelectorAll('div.css-53yrcz-CardGridDesktopLandscape__cardWrapperDesktop div[data-component="WithClickTrackingComponent"] a').href
+            }*/
+        })
+
+        data.freeGameName.forEach(async (name, arrNum) => {
+            if(pastGames.has(name)){// checks if same game was already sent :p 
+                log("Game has already been sent!")
+                //await browser.close();
+                return
+            }
+            pastGames.add(name)
+            let webhooks = JSON.parse( fs.readFileSync("data", 'utf-8') )
+            webhooks.forEach(hook => {
+                sendWebHook(hook, data.freeGameURL[arrNum], name, data.freeStatus[arrNum], data.freeDate[arrNum], data.freeGameIMG[arrNum])
+                console.log(hook)
+            });
+            writeLog(`${name} has been sent!`)
+        });
+        //await page.screenshot({path: 'example.png'});
         await browser.close();
-        return
-    } 
-    pastGames.add(data.freeGameName)
-    let webhooks = JSON.parse( fs.readFileSync("data", 'utf-8') )
-    webhooks.forEach(hook => {
-        sendWebHook(hook, data.freeGameURL, data.freeGameName, data.freeStatus, data.freeGameIMG)
-    });
-    writeLog(`${data.freeGameName} has been sent!`)
-    //await page.screenshot({path: 'example.png'});
-    await browser.close();
-    log("Task Finished")
-    log("Running Cooldown (12 hours)")
+        log("Task Finished")
+        log("Running Cooldown (12 hours)")
+    }catch(err){
+        console.log(err)
+    }
 }
 
 if(!fs.existsSync("data")){
