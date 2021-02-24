@@ -147,7 +147,8 @@ async function RunTask(){
                 //await browser.close();
                 return
             }
-            pastGames.add(name)
+            data.freeStatus == "FREE NOW" ? pastGames.add(name) : "";
+
             let webhooks = JSON.parse( fs.readFileSync("data", 'utf-8') )
             webhooks.forEach(hook => {
                 sendWebHook(hook, data.freeGameURL[arrNum], name, data.freeStatus[arrNum], data.freeDate[arrNum], data.freeGameIMG[arrNum])
