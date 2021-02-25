@@ -189,5 +189,5 @@ if(!fs.existsSync("data")){
     RunTask()
     setInterval( function () {
         RunTask()
-    }, 50000)
+    }, 43200000)
 }
