@@ -88,6 +88,7 @@ function sendWebHook(hookUrl, gameURL, gameTitle, gameStatus, gameDate, gameIMG)
     })
 }
 let pastGames = new Set()
+let comingGames = new Set()
 async function RunTask(){
     log("Running Task")
 
@@ -141,21 +142,37 @@ async function RunTask(){
             }*/
         })
 
+        
+        //console.log(`Coming Game: ${comingGames}`)
+        comingGames.add("Rage 2")
+
         data.freeGameName.forEach(async (name, arrNum) => {
             if(pastGames.has(name)){// checks if same game was already sent :p 
-                log("Game has already been sent!")
+                log(`${name} has already been sent!`)
                 //await browser.close();
                 return
             }
-            data.freeStatus == "FREE NOW" ? pastGames.add(name) : "";
-
+            if (comingGames.has(name) && data.freeStatus[arrNum] == "FREE NOW"){
+                log(`${name} was in coming soon and now is available!`)
+                comingGames.delete(name)
+            }
+            
+            if(comingGames.has(name)){
+                log(`${name} is in coming soon, waiting till its out of coming soon`)
+                return
+            }
+            
+            data.freeStatus[arrNum] == "FREE NOW" ? pastGames.add(name) : comingGames.add(name);
+            
             let webhooks = JSON.parse( fs.readFileSync("data", 'utf-8') )
             webhooks.forEach(hook => {
                 sendWebHook(hook, data.freeGameURL[arrNum], name, data.freeStatus[arrNum], data.freeDate[arrNum], data.freeGameIMG[arrNum])
             });
+            console.log(`Sending ${name}`)
             writeLog(`${name} has been sent!`)
         });
         //await page.screenshot({path: 'example.png'});
+        
         await browser.close();
         log("Task Finished")
         log("Running Cooldown (12 hours)")
@@ -172,5 +189,5 @@ if(!fs.existsSync("data")){
     RunTask()
     setInterval( function () {
         RunTask()
-    }, 43200000)
+    }, 50000)
 }
