@@ -142,9 +142,6 @@ async function RunTask(){
             }*/
         })
 
-        
-        //console.log(`Coming Game: ${comingGames}`)
-        comingGames.add("Rage 2")
 
         data.freeGameName.forEach(async (name, arrNum) => {
             if(pastGames.has(name)){// checks if same game was already sent :p 
