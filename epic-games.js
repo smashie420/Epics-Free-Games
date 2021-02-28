@@ -70,7 +70,6 @@ function sendWebHook(hookUrl, gameURL, gameTitle, gameStatus, gameDate, gameIMG)
 
     const embed = new MessageBuilder()
     .setTitle('Todays Free Game')
-    //.setDescription(` <@242889488785866752> \`${productSite.toUpperCase()} ${productShortTitle}\` **IS IN STOCK**`)
     .setURL(`${gameURL}`)
     .setColor('#000000')
     .setImage(gameIMG)
@@ -90,12 +89,11 @@ function sendWebHook(hookUrl, gameURL, gameTitle, gameStatus, gameDate, gameIMG)
 let pastGames = new Set()
 let comingGames = new Set()
 async function RunTask(){
-    log("Running Task")
-
-    //let discordURL = fs.readFileSync('data', 'utf-8')
+    log("Opening Chrome")
     try{
         const browser = await puppeteer.launch();
         const page = await browser.newPage();
+        log("Going to Epic Games")
         await page.goto('https://www.epicgames.com/store/en-US/');
         await page.waitForSelector("div.css-1x7so3u-CardGroupHighlightDesktop__root span.css-2ucwu")
 
@@ -103,74 +101,74 @@ async function RunTask(){
         const data = await page.evaluate(() =>{
             let resGameNameArr = []
             document.querySelectorAll("div.css-1x7so3u-CardGroupHighlightDesktop__root span.css-2ucwu").forEach((res)=>{
-                resGameNameArr.push(res.innerHTML)
+                resGameNameArr.push(res.innerHTML) // Returns ALL Game Names -> Sunless Sea
             })
 
             let resGameImgArr = []
             document.querySelectorAll("div.css-1x7so3u-CardGroupHighlightDesktop__root img").forEach((res) =>{
-                resGameImgArr.push(res.src)
+                resGameImgArr.push(res.src) // Returns ALL Game Images -> https://cdn1.epicgames.com/d66c34349a054c3ea529726a5687520e/offer/EGS_WargameRedDragon_EugenSystems_S1-2560x1440-300f7ef2c4b0f994757eddac0c1d7b8b.jpg?h=480&resize=1&w=854
             })
 
             let resDateArr = []
             document.querySelectorAll("div.css-1x7so3u-CardGroupHighlightDesktop__root span.css-os6fbq").forEach((res)=>{
-                resDateArr.push(res.innerText)
+                resDateArr.push(res.innerText) // Returns ALL Game Dates -> Free Now - Mar 04 at 08:00 AM
             })
 
             let resStatusArr = []
             document.querySelectorAll("div.css-1x7so3u-CardGroupHighlightDesktop__root div.css-1r3zsoc-StatusBar__root, div.css-1x7so3u-CardGroupHighlightDesktop__root div.css-1pfureu-StatusBar__root").forEach((res)=>{
-                resStatusArr.push(res.innerText)
+                resStatusArr.push(res.innerText) // Returns ALL Game Status -> FREE NOW
             })
 
             let resGameURLArr = []
-            document.querySelectorAll("div.css-1x7so3u-CardGroupHighlightDesktop__root div.css-53yrcz-CardGridDesktopLandscape__cardWrapperDesktop div[data-component='WithClickTrackingComponent'] a").forEach((res)=>{
-                resGameURLArr.push(res.href)
+            document.querySelectorAll("div.css-1x7so3u-CardGroupHighlightDesktop__root div.css-53yrcz-CardGridDesktopLandscape__cardWrapperDesktop div a").forEach((res)=>{
+                resGameURLArr.push(res.href) // Returns ALL Game URLs -> https://www.epicgames.com/store/en-US/p/sunless-sea
             })
             
-            return{
-                freeGameName: resGameNameArr,
-                freeGameIMG: resGameImgArr,
-                freeStatus: resStatusArr,
-                freeDate: resDateArr,
-                freeGameURL: resGameURLArr
+            var finalArr = []
+            for(var i = 0; i < resGameNameArr.length;i++){
+                finalArr.push(
+                    {
+                        freeGameName: resGameNameArr[i],
+                        freeGameIMG: resGameImgArr[i],
+                        freeGameStatus: resStatusArr[i],
+                        freeGameDate: resDateArr[i],
+                        freeGameURL: resGameURLArr[i]
+                    }
+                )
             }
-            /*
-            return {
-                freeGameName: document.querySelectorAll("div.css-1x7so3u-CardGroupHighlightDesktop__root span.css-2ucwu").innerHTML,
-                freeGameIMG: document.querySelectorAll("div.css-1x7so3u-CardGroupHighlightDesktop__root img").src,
-                freeStatus: document.querySelectorAll("div.css-1x7so3u-CardGroupHighlightDesktop__root span.css-os6fbq").innerText,
-                freeGameURL: document.querySelectorAll('div.css-53yrcz-CardGridDesktopLandscape__cardWrapperDesktop div[data-component="WithClickTrackingComponent"] a').href
-            }*/
+            return finalArr
         })
-
-
-        data.freeGameName.forEach(async (name, arrNum) => {
-            if(pastGames.has(name)){// checks if same game was already sent :p 
-                log(`${name} has already been sent!`)
+        log("Closing Chrome")
+        await browser.close()
+        log("Got all data");
+        
+        
+        data.forEach(async (game) => {
+            if(pastGames.has(game.freeGameName)){// checks if same game was already sent :p 
+                log(`${game.freeGameName} has already been sent!`)
                 //await browser.close();
                 return
             }
-            if (comingGames.has(name) && data.freeStatus[arrNum] == "FREE NOW"){
-                log(`${name} was in coming soon and now is available!`)
-                comingGames.delete(name)
+            if (comingGames.has(game.freeGameName) && game.freeGameStatus == "FREE NOW"){
+                log(`${game.freeGameName} was in coming soon and now is available!`)
+                comingGames.delete(game.freeGameName)
             }
             
-            if(comingGames.has(name)){
-                log(`${name} is in coming soon, waiting till its out of coming soon`)
+            if(comingGames.has(game.freeGameName)){
+                log(`${game.freeGameName} is in coming soon, waiting till its out of coming soon`)
                 return
             }
             
-            data.freeStatus[arrNum] == "FREE NOW" ? pastGames.add(name) : comingGames.add(name);
+            data.freeGameStatus == "FREE NOW" ? pastGames.add(game.freeGameName) : comingGames.add(game.freeGameName);
             
             let webhooks = JSON.parse( fs.readFileSync("data", 'utf-8') )
             webhooks.forEach(hook => {
-                sendWebHook(hook, data.freeGameURL[arrNum], name, data.freeStatus[arrNum], data.freeDate[arrNum], data.freeGameIMG[arrNum])
+                sendWebHook(hook, game.freeGameURL, game.freeGameName, game.freeGameStatus, game.freeGameDate, game.freeGameIMG)
             });
-            console.log(`Sending ${name}`)
-            writeLog(`${name} has been sent!`)
+            log(`Sending ${game.freeGameURL}`)
+            writeLog(`${game.freeGameURL} has been sent!`)
         });
-        //await page.screenshot({path: 'example.png'});
         
-        await browser.close();
         log("Task Finished")
         log("Running Cooldown (12 hours)")
     }catch(err){
