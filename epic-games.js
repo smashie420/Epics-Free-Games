@@ -3,6 +3,7 @@ const fs = require('fs') // For reading files
 const { Webhook, MessageBuilder } = require('discord-webhook-node') // For discord
 const spawn = require('child_process')
 const colors = require('colors')
+const { fileURLToPath } = require('url')
 function log(msg){
     let date_ob =  new Date();
     // YYYY-MM-DD HH:MM:SS format
@@ -93,6 +94,19 @@ async function RunTask(){
     try{
         const browser = await puppeteer.launch();
         const page = await browser.newPage();
+        /* Compare github version to local version */
+        await page.goto('https://raw.githubusercontent.com/smashie420/Epic-Games-Today-Free-Day/master/version')
+        await page.waitForSelector('pre')
+        var versionNum = await page.$('pre')
+        let githubVersion = await page.evaluate(el => el.textContent, versionNum)
+        
+        /* Checks if the file 'version' exists */ 
+        !fs.existsSync('version') ? fs.writeFileSync("version", githubVersion, 'utf8') : ""
+        
+        if( parseFloat(githubVersion) > parseFloat(fs.readFileSync('version', 'utf-8'))){
+           log(`${colors.red("OUT OF DATE!")} Get the lastest versoin here https://github.com/smashie420/Epic-Games-Today-Free-Day`)
+        }
+        /* Epic stuff */
         log("Going to Epic Games")
         await page.goto('https://www.epicgames.com/store/en-US/');
         await page.waitForSelector("div.css-1x7so3u-CardGroupHighlightDesktop__root span.css-2ucwu")
