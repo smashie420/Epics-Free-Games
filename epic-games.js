@@ -156,8 +156,9 @@ async function RunTask(){
         await browser.close()
         log("Got all data");
         
-        
+        pastGames.add("Sunless Sea")
         data.forEach(async (game) => {
+            console.log(game.freeGameName)
             if(pastGames.has(game.freeGameName)){// checks if same game was already sent :p 
                 log(`${game.freeGameName} has already been sent!`)
                 //await browser.close();
@@ -173,11 +174,11 @@ async function RunTask(){
                 return
             }
             
-            data.freeGameStatus == "FREE NOW" ? pastGames.add(game.freeGameName) : comingGames.add(game.freeGameName);
-            
+            game.freeGameStatus == "FREE NOW" ? pastGames.add(game.freeGameName) : comingGames.add(game.freeGameName);
+
             let webhooks = JSON.parse( fs.readFileSync("data", 'utf-8') )
             webhooks.forEach(hook => {
-                sendWebHook(hook, game.freeGameURL, game.freeGameName, game.freeGameStatus, game.freeGameDate, game.freeGameIMG)
+                //sendWebHook(hook, game.freeGameURL, game.freeGameName, game.freeGameStatus, game.freeGameDate, game.freeGameIMG)
             });
             log(`Sending ${game.freeGameURL}`)
             writeLog(`${game.freeGameURL} has been sent!`)
