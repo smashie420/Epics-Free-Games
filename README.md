@@ -53,7 +53,7 @@ echo "[EPIC FREE GAMES] Finished! Please run pm2 start epic-games.js"
   ## Windows
   | Command (In cmd or powershell) | Description | Notes |
   | --- | --- | --- |
-  | `node index.js` | Runs the program & auto notifies you when products are in stock | Make sure your in the `Epic-Games-Today-Free-Day` directory |
+  | `node index.js` | Runs the program & auto notifies you when the next game is available | Make sure your in the `Epic-Games-Today-Free-Day` directory |
     
   ## Linux 
   | Command  | Description | Notes |
