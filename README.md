@@ -27,7 +27,7 @@
 git clone https://github.com/smashie420/Epic-Games-Today-Free-Day
 cd Epic-Games-Today-Free-Day
 npm install
-node index.js
+node dataMaker.js
 ```
 
 
