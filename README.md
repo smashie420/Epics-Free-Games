@@ -4,6 +4,7 @@
   </p>
 
   <p>
+    <a href="https://discord.gg/GvEMJ9d"><img src="https://img.shields.io/badge/Discord-smashguns%236175-%237289DA?style=for-the-badge&logo=discord" alt="discord"/></a>
     <img src="https://img.shields.io/github/stars/smashie420/Epic-Games-Today-Free-Day?style=for-the-badge">
     <img src="https://img.shields.io/github/license/smashie420/Epic-Games-Today-Free-Day?style=for-the-badge">
     <img src="https://img.shields.io/github/issues/smashie420/Epic-Games-Today-Free-Day?style=for-the-badge">
