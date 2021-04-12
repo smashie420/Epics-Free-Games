@@ -4,9 +4,10 @@
   </p>
 
   <p>
+    <a href="https://discord.gg/GvEMJ9d"><img src="https://img.shields.io/badge/Discord-smashguns%236175-%237289DA?style=for-the-badge&logo=discord" alt="discord"/></a>
     <img src="https://img.shields.io/github/stars/smashie420/Epic-Games-Today-Free-Day?style=for-the-badge">
     <img src="https://img.shields.io/github/license/smashie420/Epic-Games-Today-Free-Day?style=for-the-badge">
-    <img src="https://img.shields.io/bitbucket/issues-raw/smashie420/Epic-Games-Today-Free-Day?style=for-the-badge">
+    <img src="https://img.shields.io/github/issues/smashie420/Epic-Games-Today-Free-Day?style=for-the-badge">
     
   </p>
   <p style="text-align: center;">
@@ -27,7 +28,7 @@
 git clone https://github.com/smashie420/Epic-Games-Today-Free-Day
 cd Epic-Games-Today-Free-Day
 npm install
-node index.js
+node dataMaker.js
 ```
 
 
@@ -53,7 +54,7 @@ echo "[EPIC FREE GAMES] Finished! Please run pm2 start epic-games.js"
   ## Windows
   | Command (In cmd or powershell) | Description | Notes |
   | --- | --- | --- |
-  | `node index.js` | Runs the program & auto notifies you when products are in stock | Make sure your in the `Epic-Games-Today-Free-Day` directory |
+  | `node index.js` | Runs the program & auto notifies you when the next game is available | Make sure your in the `Epic-Games-Today-Free-Day` directory |
     
   ## Linux 
   | Command  | Description | Notes |
