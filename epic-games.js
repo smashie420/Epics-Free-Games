@@ -104,7 +104,7 @@ async function RunTask(){
         !fs.existsSync('version') ? fs.writeFileSync("version", githubVersion, 'utf8') : ""
         
         if( parseFloat(githubVersion) > parseFloat(fs.readFileSync('version', 'utf-8'))){
-           log(`${colors.red("OUT OF DATE!")} Get the lastest versoin here https://github.com/smashie420/Epic-Games-Today-Free-Day`)
+           log(`${colors.red("OUT OF DATE!")} Get the lastest version here https://github.com/smashie420/Epic-Games-Today-Free-Day`)
         }
         /* Epic stuff */
         log("Going to Epic Games")
