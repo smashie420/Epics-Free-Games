@@ -134,7 +134,7 @@ async function RunTask(){
             })
 
             let resGameURLArr = []
-            document.querySelectorAll("div.css-1x7so3u-CardGroupHighlightDesktop__root div.css-53yrcz-CardGridDesktopLandscape__cardWrapperDesktop div a").forEach((res)=>{
+            document.querySelectorAll("div.css-1x7so3u-CardGroupHighlightDesktop__root div.css-11syfh5-CardGrid-styles__card a").forEach((res)=>{
                 resGameURLArr.push(res.href) // Returns ALL Game URLs -> https://www.epicgames.com/store/en-US/p/sunless-sea
             })
             
@@ -149,19 +149,19 @@ async function RunTask(){
                         freeGameURL: resGameURLArr[i]
                     }
                 )
+                
             }
+           
             return finalArr
         })
         log("Closing Chrome")
         await browser.close()
         log("Got all data");
         
-        pastGames.add("Sunless Sea")
         data.forEach(async (game) => {
             console.log(game.freeGameName)
             if(pastGames.has(game.freeGameName)){// checks if same game was already sent :p 
                 log(`${game.freeGameName} has already been sent!`)
-                //await browser.close();
                 return
             }
             if (comingGames.has(game.freeGameName) && game.freeGameStatus == "FREE NOW"){
