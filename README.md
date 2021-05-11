@@ -1,3 +1,4 @@
+![Banner Image](https://i.imgur.com/hiUD8fe.png)
 <div align="center">
   <p>
     <img src="https://i.imgur.com/hiUD8fe.png" title="Logo">
