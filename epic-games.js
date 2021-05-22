@@ -159,6 +159,7 @@ async function RunTask(){
         log("Got all data");
         
         data.forEach(async (game) => {
+            if(game.freeGameName.includes('<div')) return
             console.log(game.freeGameName)
             if(pastGames.has(game.freeGameName)){// checks if same game was already sent :p 
                 log(`${game.freeGameName} has already been sent!`)
