@@ -109,32 +109,32 @@ async function RunTask(){
         /* Epic stuff */
         log("Going to Epic Games")
         await page.goto('https://www.epicgames.com/store/en-US/');
-        await page.waitForSelector("div.css-1x7so3u-CardGroupHighlightDesktop__root span.css-2ucwu")
+        await page.waitForSelector("div.css-voksei")
 
         await autoScroll(page) // Need to do this because cloudflare and image doesnt load unless scrolled
         const data = await page.evaluate(() =>{
             let resGameNameArr = []
-            document.querySelectorAll("div.css-1x7so3u-CardGroupHighlightDesktop__root span.css-2ucwu").forEach((res)=>{
+            document.querySelectorAll("#dieselReactWrapper > div > div.css-xxkdgb > main > div > div.css-dpai7y > div > div > span:nth-child(7) > div > div > section > div > div > div > div > a > div > div > div.css-hkjq8i > span.css-2ucwu > div").forEach((res)=>{
                 resGameNameArr.push(res.innerHTML) // Returns ALL Game Names -> Sunless Sea
             })
 
             let resGameImgArr = []
-            document.querySelectorAll("div.css-1x7so3u-CardGroupHighlightDesktop__root img").forEach((res) =>{
+            document.querySelectorAll("#dieselReactWrapper > div > div.css-xxkdgb > main > div > div.css-dpai7y > div > div > span:nth-child(7) > div > div > section > div > div > div > div > a > div > div > div.css-f0xnhl > div.css-1lozana > div > img").forEach((res) =>{
                 resGameImgArr.push(res.src) // Returns ALL Game Images -> https://cdn1.epicgames.com/d66c34349a054c3ea529726a5687520e/offer/EGS_WargameRedDragon_EugenSystems_S1-2560x1440-300f7ef2c4b0f994757eddac0c1d7b8b.jpg?h=480&resize=1&w=854
             })
 
             let resDateArr = []
-            document.querySelectorAll("div.css-1x7so3u-CardGroupHighlightDesktop__root span.css-os6fbq").forEach((res)=>{
+            document.querySelectorAll("#dieselReactWrapper > div > div.css-xxkdgb > main > div > div.css-dpai7y > div > div > span:nth-child(7) > div > div > section > div > div > div > div > a > div > div > div.css-hkjq8i > span.css-os6fbq > div > span").forEach((res)=>{
                 resDateArr.push(res.innerText) // Returns ALL Game Dates -> Free Now - Mar 04 at 08:00 AM
             })
 
             let resStatusArr = []
-            document.querySelectorAll("div.css-1x7so3u-CardGroupHighlightDesktop__root div.css-1r3zsoc-StatusBar__root, div.css-1x7so3u-CardGroupHighlightDesktop__root div.css-1pfureu-StatusBar__root").forEach((res)=>{
+            document.querySelectorAll("#dieselReactWrapper > div > div.css-xxkdgb > main > div > div.css-dpai7y > div > div > span:nth-child(7) > div > div > section > div > div> div > div > a > div > div > div.css-f0xnhl > div.css-1kggtxl > div > div > span").forEach((res)=>{
                 resStatusArr.push(res.innerText) // Returns ALL Game Status -> FREE NOW
             })
 
             let resGameURLArr = []
-            document.querySelectorAll("div.css-1x7so3u-CardGroupHighlightDesktop__root div.css-11syfh5-CardGrid-styles__card a").forEach((res)=>{
+            document.querySelectorAll("#dieselReactWrapper > div > div.css-xxkdgb > main > div > div.css-dpai7y > div > div > span:nth-child(7) > div > div > section > div > div> div > div > a").forEach((res)=>{
                 resGameURLArr.push(res.href) // Returns ALL Game URLs -> https://www.epicgames.com/store/en-US/p/sunless-sea
             })
             
@@ -157,7 +157,8 @@ async function RunTask(){
         log("Closing Chrome")
         await browser.close()
         log("Got all data");
-        
+        console.log(data)
+
         data.forEach(async (game) => {
             if(game.freeGameName.includes('<div')) return
             console.log(game.freeGameName)
