@@ -126,7 +126,7 @@ async function main(){
 
 setTimeout(()=>{
     main();
-},30000)
+},43200000)
 main();
 
 
