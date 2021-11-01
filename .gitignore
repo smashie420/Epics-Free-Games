@@ -1,3 +1,6 @@
+OLD_VERSION
 /data
 /example.png
 /node_modules
+webhooks
+gamesSent.json

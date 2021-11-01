@@ -1,9 +1,143 @@
 const puppeteer = require('puppeteer') // Webscraping 
 const fs = require('fs') // For reading files
 const { Webhook, MessageBuilder } = require('discord-webhook-node') // For discord
-const spawn = require('child_process')
 const colors = require('colors')
-const { fileURLToPath } = require('url')
+const readline = require("readline");
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+
+// Get arguments when running node from CLI || node epic-games.js -config ---> RETURNS -config 
+var myArgs = process.argv.slice(2);
+
+// Check if user is wanting config if so show
+if(myArgs[0] === '-config') {
+    runDataGenerator();
+    return
+}else if(!fs.existsSync("webhooks")){ // If user doesnt want config but data isnt available, send warning msg then quit after 3s
+    warn(`It seems like you dont have webhook configured! This means you wont get post notifications on discord! ${colors.red("Run")} ${colors.cyan('node epic-games.js -config')} ${colors.red("to configure")}`)
+    process.exit(this);
+}
+
+// Main function to get data from web & webhook sender
+
+
+async function main(){
+    log("Opening Chrome")
+
+    const browser = process.platform === 'win32' ? await puppeteer.launch({headless:false}) : await puppeteer.launch({executablePath: '/usr/bin/chromium-browser'})
+    const page = await browser.newPage();
+
+    // CHECKS FOR UPDATES
+    log("Checking version with github version")
+    await page.goto('https://raw.githubusercontent.com/smashie420/Epic-Games-Today-Free-Day/master/version')
+    await page.waitForSelector('pre')
+    var versionNum = await page.$('pre')
+    let githubVersion = await page.evaluate(el => el.textContent, versionNum)
+    // Checks if the file 'version' exists 
+    !fs.existsSync('version') ? fs.writeFileSync("version", githubVersion, 'utf8') : ""
+    if( parseFloat(githubVersion) > parseFloat(fs.readFileSync('version', 'utf-8'))){
+        warn(`${colors.red("OUT OF DATE!")} Get the lastest version here https://github.com/smashie420/Epic-Games-Today-Free-Day`)
+    }
+    
+    // EPIC WEBSCRAPING
+    log("Going to Epic Games")
+    await page.goto('https://www.epicgames.com/store/en-US/free-games');
+    await page.waitForSelector("#dieselReactWrapper")
+
+    /* How id want the array to be formatted
+    [
+        {
+            name:"Game 1",
+            date: "Free Now - Nov 04 at 08:00 AM",
+            status: "FREE NOW",
+            image: "imgLink",
+            link: "Game url here"
+        },
+        {   
+            name:"Game 2",
+            date: "COMING SOON NOV 20",
+            status: "COMING SOON",
+            image: "imgLink",
+            link: "Game url here"
+        }
+    ]
+    */
+    let data = await page.evaluate(()=>{
+        let finalArr = []
+        // Scans each free card and scrapes data
+        document.querySelectorAll("span > div > div > section > div > div > div > div > a").forEach((parent)=>{
+            let gameName = parent.querySelector("div > div > div.css-hkjq8i > span.css-2ucwu > div").innerText
+            let gameDate = parent.querySelector("div > div > div.css-hkjq8i > span.css-os6fbq > div > span").innerText
+            let gameStatus = parent.querySelector("div > div > div.css-f0xnhl > div.css-1kggtxl > div > div > span").innerText
+            let gameImage = parent.querySelector("div > div > div.css-f0xnhl > div.css-1ihd7u3 > div > img").src
+            let gameLink = parent.href
+            finalArr.push({
+                name:gameName,
+                date: gameDate,
+                status: gameStatus,
+                image: gameImage,
+                link: gameLink
+            })
+          
+        })
+        return finalArr
+    })
+    log("Got all data! Closing chrome!")
+    await browser.close()
+
+    // Add logic to check if game has been sent before or is in past games
+
+    data.forEach((gameData)=>{
+        // Checks if file exists, if not make one with an empty json array
+        if(!fs.existsSync('gamesSent.json')) {fs.writeFileSync('gamesSent.json', "[]")}
+        // Read JSON and convert to array
+        let pastGames = JSON.parse(fs.readFileSync("gamesSent.json"));
+       
+        if(pastGames.find(gameName => gameName == gameData.name)){ // Checks if game is in gameSent.json if so dont send webhook
+            log(`${gameData.name} has already been sent!`)
+            return
+        }
+
+        if(gameData.status == "FREE NOW" || gameData.status == "Free Now"){ // Checks if game is FREE NOW instead of coming soon, other wise it wouldnt send it when it came free
+            pastGames.push(gameData.name);
+        }
+        fs.writeFileSync('gamesSent.json', JSON.stringify(pastGames)) // ReWrite the array with the updated list
+   
+        // Webhook stuff
+        let webhooks = JSON.parse( fs.readFileSync("webhooks", 'utf-8') )
+        webhooks.forEach(hook => {
+            sendWebHook(hook, gameData) 
+        });
+    })
+}
+
+
+setTimeout(()=>{
+    main();
+},43200000)
+main();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// GENERAL UTILITY
 function log(msg){
     let date_ob =  new Date();
     // YYYY-MM-DD HH:MM:SS format
@@ -11,24 +145,10 @@ function log(msg){
     console.log(`${colors.cyan('[EPIC FREE GAMES]')} ${colors.magenta(formattedTime)} ${msg}`)
 }
 
-function runScript(scriptPath, callback) {
-    // keep track of whether callback has been invoked to prevent multiple invocations
-    var invoked = false
-    var process = spawn.fork(scriptPath)
-        // listen for errors as they may prevent the exit event from firing
-    process.on('error', function(err) {
-        if (invoked) return
-        invoked = true
-        callback(err)
-    });
-    // execute the callback once the process has finished running
-    process.on('exit', function(code) {
-        if (invoked) return
-        invoked = true
-        var err = code === 0 ? null : new Error('exit code ' + code)
-        callback(err)
-    });
+function warn(msg){
+    console.log(`${colors.cyan('[EPIC FREE GAMES]')} ${colors.red("WARNING!")} ${colors.yellow(msg)}`)
 }
+
 async function writeLog(text){
     let date_ob =  new Date();
     // YYYY-MM-DD HH:MM:SS format
@@ -46,39 +166,58 @@ async function writeLog(text){
 }
 
 
-async function autoScroll(page){ // https://stackoverflow.com/questions/51529332/puppeteer-scroll-down-until-you-cant-anymore/53527984
-    await page.evaluate(async () => {
-        await new Promise((resolve, reject) => {
-            var totalHeight = 0;
-            var distance = 100;
-            var timer = setInterval(() => {
-                var scrollHeight = document.body.scrollHeight;
-                window.scrollBy(0, distance);
-                totalHeight += distance;
+// Webhook Getters
+function runDataGenerator(){
+    let webhooks = []
 
-                if(totalHeight >= scrollHeight){
-                    clearInterval(timer);
-                    resolve();
-                }
-            }, 100);
-        });
+    function enterMoreUrls(){
+        rl.question("[EPIC FREE GAMES] Would you like to enter another url? (y/n): ", function saveInput(userInput){
+          if(stringToBoolean(userInput)){
+            rl.question("[EPIC FREE GAMES] Enter your discord webhook: ", function saveInput(url) {
+              webhooks.push(url)
+              enterMoreUrls() 
+            })
+          }else{
+              fs.writeFileSync("webhooks", JSON.stringify(webhooks))
+            rl.close();
+          }
+        })
+      }
+    function stringToBoolean(string){
+        switch(string.toLowerCase().trim()){
+            case "true": case "yes": case "1": case "y": return true;
+            case "false": case "no": case "0": case "n": case null: return false;
+            default: return Boolean(string);
+        }
+      }
+    
+    rl.question('[EPIC FREE GAMES] Enter your discord webhook: ', function(discordWebHook) {
+        webhooks.push(discordWebHook)
+        enterMoreUrls()
+    });
+    rl.on("close", function() {
+        main();
     });
 }
-function sendWebHook(hookUrl, gameURL, gameTitle, gameStatus, gameDate, gameIMG){
+
+
+// Webhook Sender
+function sendWebHook(hookUrl, gameData){
+
     const hook = new Webhook(hookUrl);
     hook.setUsername('Epic Games');
     hook.setAvatar('https://d3bzyjrsc4233l.cloudfront.net/company_office/epicgames_logo.png');
 
     const embed = new MessageBuilder()
     .setTitle('Todays Free Game')
-    .setURL(`${gameURL}`)
+    .setURL(`${gameData.link}`)
     .setColor('#000000')
-    .setImage(gameIMG)
-    .addField('Name', `\`${gameTitle}\``, true)
-    .addField('Status', `\`${gameStatus}\``, true)
-    .addField('Date', `\`${gameDate}\``, true)
+    .setImage(gameData.image)
+    .addField('Name', `\`${gameData.name}\``, true)
+    .addField('Status', `\`${gameData.status}\``, true)
+    .addField('Date', `\`${gameData.date}\``, true)
 
-    .setFooter('Made by smashguns#6175', 'https://cdn.discordapp.com/avatars/242889488785866752/a_4f1fac503d4d074585a697083c62e410.gif?size=128')
+    .setFooter('Made by smashguns#6175', 'https://images-ext-2.discordapp.net/external/qP6Ln7jyRnRjYSjRPuEMQ_zvNeRjdoFankR32GGFPlA/https/cdn.discordapp.com/avatars/242889488785866752/53c0542ef5100e479b13187aaee8bcee.webp')
     .setTimestamp();
 
     hook.send(embed).catch(error =>{
@@ -86,120 +225,4 @@ function sendWebHook(hookUrl, gameURL, gameTitle, gameStatus, gameDate, gameIMG)
             console.error(error)
         }
     })
-}
-let pastGames = new Set()
-let comingGames = new Set()
-async function RunTask(){
-    log("Opening Chrome")
-    try{
-        const browser = await puppeteer.launch();
-        const page = await browser.newPage();
-        /* Compare github version to local version */
-        await page.goto('https://raw.githubusercontent.com/smashie420/Epic-Games-Today-Free-Day/master/version')
-        await page.waitForSelector('pre')
-        var versionNum = await page.$('pre')
-        let githubVersion = await page.evaluate(el => el.textContent, versionNum)
-        
-        /* Checks if the file 'version' exists */ 
-        !fs.existsSync('version') ? fs.writeFileSync("version", githubVersion, 'utf8') : ""
-        
-        if( parseFloat(githubVersion) > parseFloat(fs.readFileSync('version', 'utf-8'))){
-           log(`${colors.red("OUT OF DATE!")} Get the lastest version here https://github.com/smashie420/Epic-Games-Today-Free-Day`)
-        }
-        /* Epic stuff */
-        log("Going to Epic Games")
-        await page.goto('https://www.epicgames.com/store/en-US/');
-        await page.waitForSelector("div.css-voksei")
-
-        await autoScroll(page) // Need to do this because cloudflare and image doesnt load unless scrolled
-        const data = await page.evaluate(() =>{
-            let resGameNameArr = []
-            document.querySelectorAll("#dieselReactWrapper > div > div.css-xxkdgb > main > div > div.css-dpai7y > div > div > span:nth-child(7) > div > div > section > div > div > div > div > a > div > div > div.css-hkjq8i > span.css-2ucwu > div").forEach((res)=>{
-                resGameNameArr.push(res.innerHTML) // Returns ALL Game Names -> Sunless Sea
-            })
-
-            let resGameImgArr = []
-            document.querySelectorAll("#dieselReactWrapper > div > div.css-xxkdgb > main > div > div.css-dpai7y > div > div > span:nth-child(7) > div > div > section > div > div > div > div > a > div > div > div.css-f0xnhl > div.css-1lozana > div > img").forEach((res) =>{
-                resGameImgArr.push(res.src) // Returns ALL Game Images -> https://cdn1.epicgames.com/d66c34349a054c3ea529726a5687520e/offer/EGS_WargameRedDragon_EugenSystems_S1-2560x1440-300f7ef2c4b0f994757eddac0c1d7b8b.jpg?h=480&resize=1&w=854
-            })
-
-            let resDateArr = []
-            document.querySelectorAll("#dieselReactWrapper > div > div.css-xxkdgb > main > div > div.css-dpai7y > div > div > span:nth-child(7) > div > div > section > div > div > div > div > a > div > div > div.css-hkjq8i > span.css-os6fbq > div > span").forEach((res)=>{
-                resDateArr.push(res.innerText) // Returns ALL Game Dates -> Free Now - Mar 04 at 08:00 AM
-            })
-
-            let resStatusArr = []
-            document.querySelectorAll("#dieselReactWrapper > div > div.css-xxkdgb > main > div > div.css-dpai7y > div > div > span:nth-child(7) > div > div > section > div > div> div > div > a > div > div > div.css-f0xnhl > div.css-1kggtxl > div > div > span").forEach((res)=>{
-                resStatusArr.push(res.innerText) // Returns ALL Game Status -> FREE NOW
-            })
-
-            let resGameURLArr = []
-            document.querySelectorAll("#dieselReactWrapper > div > div.css-xxkdgb > main > div > div.css-dpai7y > div > div > span:nth-child(7) > div > div > section > div > div> div > div > a").forEach((res)=>{
-                resGameURLArr.push(res.href) // Returns ALL Game URLs -> https://www.epicgames.com/store/en-US/p/sunless-sea
-            })
-            
-            var finalArr = []
-            for(var i = 0; i < resGameNameArr.length;i++){
-                finalArr.push(
-                    {
-                        freeGameName: resGameNameArr[i],
-                        freeGameIMG: resGameImgArr[i],
-                        freeGameStatus: resStatusArr[i],
-                        freeGameDate: resDateArr[i],
-                        freeGameURL: resGameURLArr[i]
-                    }
-                )
-                
-            }
-           
-            return finalArr
-        })
-        log("Closing Chrome")
-        await browser.close()
-        log("Got all data");
-        console.log(data)
-
-        data.forEach(async (game) => {
-            if(game.freeGameName.includes('<div')) return
-            console.log(game.freeGameName)
-            if(pastGames.has(game.freeGameName)){// checks if same game was already sent :p 
-                log(`${game.freeGameName} has already been sent!`)
-                return
-            }
-            if (comingGames.has(game.freeGameName) && game.freeGameStatus == "FREE NOW"){
-                log(`${game.freeGameName} was in coming soon and now is available!`)
-                comingGames.delete(game.freeGameName)
-            }
-            
-            if(comingGames.has(game.freeGameName)){
-                log(`${game.freeGameName} is in coming soon, waiting till its out of coming soon`)
-                return
-            }
-            
-            game.freeGameStatus == "FREE NOW" ? pastGames.add(game.freeGameName) : comingGames.add(game.freeGameName);
-
-            let webhooks = JSON.parse( fs.readFileSync("data", 'utf-8') )
-            webhooks.forEach(hook => {
-                sendWebHook(hook, game.freeGameURL, game.freeGameName, game.freeGameStatus, game.freeGameDate, game.freeGameIMG)
-            });
-            log(`Sending ${game.freeGameURL}`)
-            writeLog(`${game.freeGameURL} has been sent!`)
-        });
-        
-        log("Task Finished")
-        log("Running Cooldown (12 hours)")
-    }catch(err){
-        console.log(err)
-    }
-}
-
-if(!fs.existsSync("data")){
-    runScript("./dataMaker.js", function(err) {
-        if (err) throw err;
-    })
-}else{
-    RunTask()
-    setInterval( function () {
-        RunTask()
-    }, 43200000)
 }
