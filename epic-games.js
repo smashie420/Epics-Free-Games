@@ -22,7 +22,7 @@ if(myArgs[0] === '-config') {
 
 // Main function to get data from web & webhook sender
 
-
+let comingGames = new Set()
 async function main(){
     log("Opening Chrome")
 
@@ -99,9 +99,19 @@ async function main(){
             log(`${gameData.name} has already been sent!`)
             return
         }
+        if (comingGames.has(gameData.name) && gameData.status == "FREE NOW"){
+            log(`${gameData.name} was in coming soon and now is available!`)
+            comingGames.delete(gameData.name)
+        }
+        if(comingGames.has(gameData.name)){
+            log(`${gameData.name} is in coming soon, waiting till its out of coming soon`)
+            return
+        }
 
         if(gameData.status == "FREE NOW" || gameData.status == "Free Now"){ // Checks if game is FREE NOW instead of coming soon, other wise it wouldnt send it when it came free
             pastGames.push(gameData.name);
+        }else{
+            comingGames.add(gameData.name);
         }
         fs.writeFileSync('gamesSent.json', JSON.stringify(pastGames)) // ReWrite the array with the updated list
    
@@ -116,7 +126,7 @@ async function main(){
 
 setTimeout(()=>{
     main();
-},43200000)
+},30000)
 main();
 
 
