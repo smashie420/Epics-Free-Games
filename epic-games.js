@@ -68,10 +68,10 @@ async function main(){
         let finalArr = []
         // Scans each free card and scrapes data
         document.querySelectorAll("span > div > div > section > div > div > div > div > a").forEach((parent)=>{
-            let gameName = parent.querySelector("div > div > div.css-hkjq8i > span.css-2ucwu > div").innerText
-            let gameDate = parent.querySelector("div > div > div.css-hkjq8i > span.css-os6fbq > div > span").innerText
-            let gameStatus = parent.querySelector("div > div > div.css-f0xnhl > div.css-1kggtxl > div > div > span").innerText
-            let gameImage = parent.querySelector("div > div > div.css-f0xnhl > div.css-1ihd7u3 > div > img").src
+            let gameName = parent.querySelector("div > div > div > span > div").innerText
+            let gameDate = parent.querySelector("div > div > div > span > div > span").innerText
+            let gameStatus = parent.querySelector("div > div > div > div > div > div > span").innerText
+            let gameImage = parent.querySelector("div > div > div > div > div > img").src
             let gameLink = parent.href
             finalArr.push({
                 name:gameName,
