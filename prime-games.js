@@ -89,7 +89,7 @@ let pastGames = new Set()
 async function RunTask(){
     log("Opening Chrome")
     try{
-        const browser = await puppeteer.launch({headless:false});
+        const browser = process.platform === 'win32' ? await puppeteer.launch({headless:false}) : await puppeteer.launch({executablePath: '/usr/bin/chromium-browser'})
         const page = await browser.newPage();
         /* Compare github version to local version 
 		
