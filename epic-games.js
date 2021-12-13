@@ -67,18 +67,21 @@ async function main(){
     let data = await page.evaluate(()=>{
         let finalArr = []
         // Scans each free card and scrapes data
+        // I know this is sloppy code but its late and i want a quick fix D:
+        let gameName,gameDate,gameStatus,gameImage,gameLink;
+
         document.querySelectorAll("span > div > div > section > div > div > div > div > a").forEach((parent)=>{
-            let gameName = parent.querySelector("div > div > div.css-hkjq8i > span.css-2ucwu > div").innerText
-            let gameDate = parent.querySelector("div > div > div.css-hkjq8i > span.css-os6fbq > div > span").innerText
-            let gameStatus = parent.querySelector("div > div > div.css-f0xnhl > div.css-1kggtxl > div > div > span").innerText
-            let gameImage = parent.querySelector("div > div > div.css-f0xnhl > div.css-1ihd7u3 > div > img").src
-            let gameLink = parent.href
+            if (parent.querySelector("div > div > div > span > div") != null) gameName = parent.querySelector("div > div > div > span > div").innerText 
+            if (parent.querySelector("div > div > div > span > div > span") != null) gameDate = parent.querySelector("div > div > div > span > div > span").innerText                    
+            if (parent.querySelector("div > div > div > div > div > div > span") != null) gameStatus = parent.querySelector("div > div > div > div > div > div > span").innerText
+            if (parent.querySelector("div > div > div > div > div > img") != null) gameImage = parent.querySelector("div > div > div > div > div > img").src
+            if (parent.querySelector("div > div > div > div > div > img") != null) gameLink = parent.href
             finalArr.push({
-                name:gameName,
-                date: gameDate,
-                status: gameStatus,
-                image: gameImage,
-                link: gameLink
+                name:gameName != null ? gameName : "UNKNOWN",
+                date: gameDate != null ? gameDate : "UNKNOWN",
+                status: gameStatus != null ? gameStatus : "UNKNOWN",
+                image: gameImage != null ? gameImage : "UNKNOWN",
+                link: gameLink != null ? gameLink : "UNKNOWN"
             })
           
         })
