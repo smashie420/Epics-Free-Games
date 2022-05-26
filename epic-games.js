@@ -44,7 +44,7 @@ async function main(){
     // EPIC WEBSCRAPING
     log("Going to Epic Games")
     await page.goto('https://www.epicgames.com/store/en-US/free-games');
-    await page.waitForSelector("#dieselReactWrapper")
+    await page.waitForSelector("div#dieselReactWrapper")
 
     /* How id want the array to be formatted
     [
