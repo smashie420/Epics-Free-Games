@@ -74,8 +74,8 @@ async function main(){
             if (parent.querySelector("div > div > div > span > div") != null) gameName = parent.querySelector("div > div > div > span > div").innerText 
             if (parent.querySelector("div > div > div > span > div > span") != null) gameDate = parent.querySelector("div > div > div > span > div > span").innerText                    
             if (parent.querySelector("div > div > div > div > div > div > span") != null) gameStatus = parent.querySelector("div > div > div > div > div > div > span").innerText
-            if (parent.querySelector("div > div > div > div > div > img") != null) gameImage = parent.querySelector("div > div > div > div > div > img").src
-            if (parent.querySelector("div > div > div > div > div > img") != null) gameLink = parent.href
+            if (parent.querySelector("div > div > div > div > div > div > div > img") != null) gameImage = parent.querySelector("div > div > div > div > div > div > div > img").src
+            if (parent.querySelector("div > div > div > div > div > div > div > img") != null) gameLink = parent.href
             finalArr.push({
                 name:gameName != null ? gameName : "UNKNOWN",
                 date: gameDate != null ? gameDate : "UNKNOWN",
