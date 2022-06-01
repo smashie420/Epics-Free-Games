@@ -1,8 +1,8 @@
 {
-  "name": "epic-games-today-free-day",
+  "name": "prime-games-today-free-day",
   "version": "1.0.0",
   "description": "",
-  "main": "epic-games.js",
+  "main": "prime-games.js",
   "dependencies": {
     "child_process": "^1.0.2",
     "colors": "^1.4.0",
