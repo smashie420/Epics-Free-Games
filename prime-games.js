@@ -114,58 +114,50 @@ async function RunTask(){
 
         await autoScroll(page) // Need to do this because cloudflare and image doesnt load unless scrolled
         const data = await page.evaluate(() =>{
+            let gameName,gameDate,gameStatus,gameImage,gameLink;
             let resGameNameArr = []
 
-            document.querySelectorAll("div > div > div > div > div > div > div > div > div > h3").forEach((res)=>{
-                resGameNameArr.push(res.innerHTML) // Returns ALL Game Names -> Sunless Sea
-            })
 
-            let resGameImgArr = []
-            document.querySelectorAll("div > div > div > div > div > div > div > div > div > div > div > div > figure > img").forEach((res) =>{
-                resGameImgArr.push(res.src) // Returns ALL Game Images -> https://cdn1.epicgames.com/d66c34349a054c3ea529726a5687520e/offer/EGS_WargameRedDragon_EugenSystems_S1-2560x1440-300f7ef2c4b0f994757eddac0c1d7b8b.jpg?h=480&resize=1&w=854
-            })
-
-            let resDateArr = []
-            document.querySelectorAll("div > div > div > div > div > div > div > div > div > div > div > p").forEach((res)=>{
-                resDateArr.push(res.innerText) // Returns ALL Game Dates -> Free Now - Mar 04 at 08:00 AM
-            })
-
-            
-            var finalArr = []
-            for(var i = 0; i < resGameNameArr.length;i++){
-                finalArr.push(
-                    {
-                        freeGameName: resGameNameArr[i],
-                        freeGameIMG: resGameImgArr[i],
-                        freeGameDate: resDateArr[i],
-                    }
-                )
+            //document.querySelectorAll("main > div > div > div > div > div:nth-child(4) > div > div > div:nth-child(2) > div > div > div > div > div > div > div").forEach((parent)=>{
+            document.querySelectorAll("main > div > div > div > div > div > div > div > div > div > div > div > div > div > div > div").forEach((parent)=>{
+                if(parent.querySelector("div > div > div > div > a > div > div > div > div > figure > img") != null)                  gameImage = parent.querySelector("div > div > div > div > a > div > div > div > div > figure > img").src
+                if(parent.querySelector("div > div > div > div > a > div > div > div > div > div > div > p") != null)                 gameName = parent.querySelector("div > div > div > div > a > div > div > div > div > div > div > p").innerText
+                if(parent.querySelector("div > div > div > div > a > div > div > div > div > div > div > div > div > p") != null)     gameDate = parent.querySelector("div > div > div > div > a > div > div > div > div > div > div > div > div > p").innerText
                 
-            }
-           
-            return finalArr
+
+                resGameNameArr.push({
+                    name:gameName != null ? gameName : "UNKNOWN",
+                    date: gameDate != null ? gameDate : "UNKNOWN",
+                    image: gameImage != null ? gameImage : "UNKNOWN"
+                })
+            })
+
+            return resGameNameArr
         })
         log("Closing Chrome")
         await browser.close()
         log("Got all data");
         
+        console.log(data)
+
+        
         data.forEach(async (game) => {
-            if(game.freeGameName.includes('<div')) return
-            console.log(game.freeGameName)
-            if(pastGames.has(game.freeGameName)){// checks if same game was already sent :p 
-                log(`${game.freeGameName} has already been sent!`)
+            if(game.name.includes('<div')) return
+            console.log(game.name)
+            if(pastGames.has(game.name)){// checks if same game was already sent :p 
+                log(`${game.name} has already been sent!`)
                 return
             }
-            pastGames.add(game.freeGameName)
+            pastGames.add(game.name)
 
             let webhooks = JSON.parse( fs.readFileSync("data", 'utf-8') )
             webhooks.forEach(hook => {
-                sendWebHook(hook, game.freeGameName, game.freeGameDate, game.freeGameIMG)
+                sendWebHook(hook, game.name, game.date, game.image)
             });
-            log(`Sending ${game.freeGameName}`)
-            writeLog(`${game.freeGameName} has been sent!`)
+            log(`Sending ${game.name}`)
+            writeLog(`${game.name} has been sent!`)
         });
-        
+
         log("Task Finished")
         log("Running Cooldown (12 hours)")
     }catch(err){
