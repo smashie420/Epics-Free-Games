@@ -19,6 +19,7 @@
   <p>
     <!--<img src="https://i.imgur.com/VOHG0Bx.gif" title="Example">-->
     <img src="https://i.imgur.com/sn0jbCJ.png" title="Example">
+    <img src="https://i.imgur.com/tzWlczT.png" title="Example">
   </p>
 </div>
 
@@ -55,13 +56,11 @@ echo "[EPIC FREE GAMES] Finished! Please run pm2 start epic-games.js"
   ## Windows
   | Command (In cmd or powershell) | Description | Notes |
   | --- | --- | --- |
-  | `node index.js` | Runs the program & auto notifies you when the next game is available | Make sure your in the `Epic-Games-Today-Free-Day` directory |
-  | `node index.js -config` | Makes the config | **THIS IS REQUIRED FOR FIRST TIME SETUP** |
+  | `node epic-games.js` | Runs the program & auto notifies you when the next game is available | Make sure your in the `Epic-Games-Today-Free-Day` directory |
     
   ## Linux 
   | Command  | Description | Notes |
   | --- | --- | --- |
-  | `node index.js -config` | Makes the config | **THIS IS REQUIRED FOR FIRST TIME SETUP** |
-  | `pm2 start index.js` | Runs the program | Make sure your in the `Epic-Games-Today-Free-Day` directory |
-  | `pm2 stop index` | Stops the program |
+  | `pm2 start epic-games.js --name Epic-Games` | Runs the program | Make sure your in the `Epic-Games-Today-Free-Day` directory |
+  | `pm2 stop Epic-Games` | Stops the program |
   | `pm2 logs` | Shows the logs |
