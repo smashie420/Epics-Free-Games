@@ -4,3 +4,5 @@ OLD_VERSION
 /node_modules
 webhooks
 gamesSent.json
+Github_Version
+game-logs.txt
