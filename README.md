@@ -45,7 +45,7 @@ Im currently trying to figure out a way to run this on arm/x86 processors
   | --- | --- | --- |
   | `node epic-games.js` | Runs the program & auto notifies you when the next game is available | Make sure your in the `Epic-Games-Today-Free-Day` directory |
     
-  ## Linux 
+  ## ~~Linux~~
   | Command  | Description | Notes |
   | --- | --- | --- |
   | `pm2 start epic-games.js --name Epic-Games` | Runs the program | Make sure your in the `Epic-Games-Today-Free-Day` directory |
