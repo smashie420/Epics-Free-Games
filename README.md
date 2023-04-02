@@ -37,21 +37,7 @@ node epic-games.js
 
 
 # Linux Installation
-```bash
-sudo apt-get update                                                   && \
-sudo apt-get install git curl unzip chromium-browser -y               && \
-curl -fsSL https://fnm.vercel.app/install | bash                      && \
-export PATH="/home/devin/.local/share/fnm:$PATH"                      && \
-eval "`fnm env`"                                                      && \
-fnm install v16                                                       && \
-sudo apt-get install npm                                              && \
-sudo npm install -g pm2                                               && \
-cd ~                                                                  && \
-git clone https://github.com/smashie420/Epic-Games-Today-Free-Day     && \
-cd Epic-Games-Today-Free-Day                                          && \
-npm install                                                           && \
-echo "[EPIC FREE GAMES] Finished! Please run pm2 start epic-games.js"
-```
+Im currently trying to figure out a way to run this on arm/x86 processors
 
 # Usage
   ## Windows
