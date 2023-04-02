@@ -37,20 +37,20 @@ node dataMaker.js
 
 # Linux Installation
 ```bash
-sudo apt update                                                       && \
-sudo apt-get install curl -y                                          && \
-curl -sL https://deb.nodesource.com/setup_14.x | sudo bash -          && \
-sudo apt-get install nodejs git curl -y                               && \
-sudo apt-get install chromium-browser=80.0.3987.163-0ubuntu1          && \
+sudo apt-get update                                                   && \
+sudo apt-get install git curl unzip chromium-browser -y               && \
+curl -fsSL https://fnm.vercel.app/install | bash                      && \
+export PATH="/home/devin/.local/share/fnm:$PATH"                      && \
+eval "`fnm env`"                                                      && \
+fnm install v16                                                       && \
+sudo apt-get install npm                                              && \
 sudo npm install -g pm2                                               && \
 cd ~                                                                  && \
 git clone https://github.com/smashie420/Epic-Games-Today-Free-Day     && \
 cd Epic-Games-Today-Free-Day                                          && \
 npm install                                                           && \
-node epic-games.js                                                    && \
 echo "[EPIC FREE GAMES] Finished! Please run pm2 start epic-games.js"
 ```
-> If you wish to change settings please run `rm data`
 
 # Usage
   ## Windows
