@@ -26,13 +26,14 @@
 # Windows Installation
 - [Node JS Installed](https://nodejs.org/en/download/)
 - [Git Installed](https://git-scm.com/downloads)
+
 ```bash
 git clone https://github.com/smashie420/Epic-Games-Today-Free-Day
 cd Epic-Games-Today-Free-Day
 npm install
-node dataMaker.js
+node epic-games.js
 ```
-
+> Don't forget to edit config.js
 
 
 # Linux Installation
