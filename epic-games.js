@@ -13,8 +13,7 @@ if(config.enableWebhooks && config.webhooks.length == 0){ // If user doesnt want
 let comingGames = new Set()
 async function main(){
     log("Opening Chrome")
-
-    const browser = process.platform === 'win32' ? await puppeteer.launch({headless:false}) : await puppeteer.launch({executablePath: '/usr/bin/chromium-browser'})
+    const browser = process.platform === 'win32' ? await puppeteer.launch({headless:config.headless}) : await puppeteer.launch({args: ['--no-sandbox'],headless: true})
     const page = await browser.newPage();
 
     // CHECKS FOR UPDATES

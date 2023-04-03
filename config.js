@@ -29,8 +29,6 @@ DEFAULTS:
 */
   
 
-  
-  
 // Config starts here
 config.headless = false                 // For puppeteer on windows. Read https://github.com/puppeteer/puppeteer#default-runtime-settings
 config.enableWebhooks = true;           // Enable/Disables webhook. ignore discord_webhooks if false

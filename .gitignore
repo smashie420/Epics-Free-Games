@@ -6,3 +6,6 @@ webhooks
 gamesSent.json
 Github_Version
 game-logs.txt
+node_modules
+game-logs.txt
+.env
