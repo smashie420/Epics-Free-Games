@@ -5,6 +5,7 @@
   "main": "epic-games.js",
   "dependencies": {
     "colors": "^1.4.0",
+    "date-and-time": "^2.4.3",
     "discord-webhook-node": "^1.1.8",
     "fs": "^0.0.1-security",
     "puppeteer": "^19.4.0"
@@ -13,5 +14,8 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "smashie420",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "dotenv": "^16.0.3"
+  }
 }

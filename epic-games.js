@@ -2,15 +2,16 @@ const puppeteer = require('puppeteer') // Webscraping
 const fs = require('fs') // For reading files
 const { Webhook, MessageBuilder } = require('discord-webhook-node') // For discord
 const colors = require('colors')
+const date = require('date-and-time')
 const config = require('./config.js')
 
-if(config.enableWebhooks && config.webhooks.length == 0){ // If user doesnt want config but data isnt available, send warning msg then quit after 3s
+if(config.enableWebhooks && config.webhooks.length == 0){ // send a warning msg if config.js isnt configured properly then quit
     warn(`It seems like you dont have webhook configured! Please view config.js!`)
     process.exit(this);
 }
 
 // Main function to get data from web & webhook sender
-let comingGames = new Set()
+
 async function main(){
     log("Opening Chrome")
     const browser = process.platform === 'win32' ? await puppeteer.launch({headless:config.headless}) : await puppeteer.launch({args: ['--no-sandbox'],headless: true})
@@ -28,12 +29,12 @@ async function main(){
         warn(`${colors.red("OUT OF DATE!")} Get the lastest version here https://github.com/smashie420/Epic-Games-Today-Free-Day`)
     }
 
-    
     // EPIC WEBSCRAPING
     log("Going to Epic Games")
-    await page.goto('https://www.epicgames.com/store/en-US/free-games');
+    await page.goto('https://www.epicgames.com/store/en-US/free-games', {waitUntil:'load'});
     await page.waitForSelector("div#dieselReactWrapper")
 
+    await autoScroll(page);
     let data = await page.evaluate(()=>{
         let finalArr = []
         // Scans each free card and scrapes data
@@ -42,13 +43,13 @@ async function main(){
         for (var i = 0; i < elements.length; i++) {
             if (elements[i].innerText == searchTerm) {
                 // Finds 'free now' on the webpage and gets individual cards
+                elements[i].scrollIntoView();
                 parent = elements[i].parentElement.parentElement.parentElement.parentElement.parentElement
-                
                 gameName = parent.querySelector("div:nth-child(3) > div").innerText 
                 gameDate = parent.querySelector("div:nth-child(3) > span").innerText 
                 gameStatus = parent.querySelector("div").innerText
                 gameImage = parent.querySelector("div:nth-child(1) > div > div > img").src
-                gameLink = parent.querySelector("div:nth-child(1)").parentElement.parentElement.parentElement.href
+                gameLink = parent.href
                 finalArr.push({
                     name:gameName,
                     date: gameDate,
@@ -58,6 +59,7 @@ async function main(){
                 })
             }
         }
+        
         return finalArr
     })
     log("Got all data! Closing chrome!")
@@ -79,18 +81,24 @@ async function main(){
         log(`Found game! ${gameData.name}`)
         // Webhook stuff
         if(!config.enableWebhooks) return;
-
         let webhooks = config.webhooks
         webhooks.forEach(hook => {
-            sendWebHook(hook, gameData) 
+            log(`Sending '${gameData.name}' to https://discord.com/api/webhooks/...${hook.slice(-6)}`)
+            sendWebHook(hook, gameData)
         });
     })
+    if(!config.runOnce) getNextRun();
 }
 
-setInterval(()=>{
+// Loop program
+if(config.runOnce){
     main();
-},1000 * config.delay)
-main();
+}else{
+    main();
+    setInterval(async()=>{
+        main();
+    },1000 * config.delay)
+}
 
 
 
@@ -120,10 +128,15 @@ function log(msg){
     writeLog(`[EPIC FREE GAMES] ${formattedTime} ${msg}`)
 }
 
+function getNextRun(){
+    const timeNow  =  new Date();
+    const nextRun = date.addSeconds(timeNow,config.delay);
+    log(`Scheduled to run again at: ${nextRun}`)
+}
+
 function warn(msg){
     console.log(`${colors.cyan('[EPIC FREE GAMES]')} ${colors.bgRed("WARNING!")} ${colors.yellow(msg)}`)
 }
-
 
 // Webhook Sender
 function sendWebHook(hookUrl, gameData){
@@ -139,13 +152,34 @@ function sendWebHook(hookUrl, gameData){
     .addField('Name', `\`${gameData.name}\``, true)
     .addField('Status', `\`${gameData.status}\``, true)
     .addField('Date', `\`${gameData.date}\``, true)
-
+    
     .setFooter('Made by smashguns#6175', 'https://cdn.discordapp.com/attachments/718712847286403116/1091174736853205122/200x200_Highres_logo.png')
     .setTimestamp();
+
 
     hook.send(embed).catch(error =>{
         if(error){
             console.error(error)
         }
     })
+}
+
+// Puppeteer AutoScroller https://stackoverflow.com/questions/51529332/puppeteer-scroll-down-until-you-cant-anymore
+// This is necessary, not scrolling will cause the embed to sometimes fail since the image returns base64
+async function autoScroll(page){
+    await page.evaluate(async () => {
+        await new Promise((resolve) => {
+            var totalHeight = 0;
+            var distance = 500;
+            var timer = setInterval(() => {
+                var scrollHeight = document.body.scrollHeight;
+                window.scrollBy(0, distance);
+                totalHeight += distance;
+                if(totalHeight >= scrollHeight - window.innerHeight){
+                    clearInterval(timer);
+                    resolve();
+                }
+            }, 100);
+        });
+    });
 }
